@@ -1,0 +1,1073 @@
+#include <math.h>
+#include <locale.h>
+#include <stdio.h>
+#include <string.h>
+#include <time.h>
+
+
+#include <windows.h>
+#include <conio.h>
+
+
+#define MAIN_MENU_SIZE 3
+#define GAME_MENU_SIZE 3
+#define SETTINGS_MENU_SIZE 4
+#define COLOR 3
+#define COLOR_BACK 17
+#define COLOR_LETTERS 17
+#define LANGUAGE 3
+#define DIFFICULTY 5
+
+
+#define NOT_KEY 67
+#define KEY_EXIT 27
+#define KEY_ENTER 13
+#define ARROW_KEY 224
+#define KEY_SPACE 0
+#define KEY_BACKSPACE 8
+#define KEY_ARROW_RIGHT 77
+#define KEY_ARROW_LEFT 75
+#define KEY_ARROW_UP 72
+#define KEY_ARROW_DOWN 80
+
+enum ConsoleColors
+{
+    BlackFore = 0,
+    MaroonFore = FOREGROUND_RED,
+    GreenFore = FOREGROUND_GREEN,
+    NavyFore = FOREGROUND_BLUE,
+    TealFore = FOREGROUND_GREEN | FOREGROUND_BLUE,
+    OliveFore = FOREGROUND_RED | FOREGROUND_GREEN,
+    PurpleFore = FOREGROUND_RED | FOREGROUND_BLUE,
+    GrayFore = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE,
+    SilverFore = FOREGROUND_INTENSITY,
+    RedFore = FOREGROUND_INTENSITY | FOREGROUND_RED,
+    LimeFore = FOREGROUND_INTENSITY | FOREGROUND_GREEN,
+    BlueFore = FOREGROUND_INTENSITY | FOREGROUND_BLUE,
+    AquaFore = FOREGROUND_INTENSITY | FOREGROUND_GREEN | FOREGROUND_BLUE,
+    YellowFore = FOREGROUND_INTENSITY | FOREGROUND_RED | FOREGROUND_GREEN,
+    FuchsiaFore = FOREGROUND_INTENSITY | FOREGROUND_RED | FOREGROUND_BLUE,
+    WhiteFore = FOREGROUND_INTENSITY | FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE,
+
+    BlackBack = 0,
+    MaroonBack = BACKGROUND_RED,
+    GreenBack = BACKGROUND_GREEN,
+    NavyBack = BACKGROUND_BLUE,
+    TealBack = BACKGROUND_GREEN | BACKGROUND_BLUE,
+    OliveBack = BACKGROUND_RED | BACKGROUND_GREEN,
+    PurpleBack = BACKGROUND_RED | BACKGROUND_BLUE,
+    GrayBack = BACKGROUND_RED | BACKGROUND_GREEN | BACKGROUND_BLUE,
+    SilverBack = BACKGROUND_INTENSITY,
+    RedBack = BACKGROUND_INTENSITY | BACKGROUND_RED,
+    LimeBack = BACKGROUND_INTENSITY | BACKGROUND_GREEN,
+    BlueBack = BACKGROUND_INTENSITY | BACKGROUND_BLUE,
+    AquaBack = BACKGROUND_INTENSITY | BACKGROUND_GREEN | BACKGROUND_BLUE,
+    YellowBack = BACKGROUND_INTENSITY | BACKGROUND_RED | BACKGROUND_GREEN,
+    FuchsiaBack = BACKGROUND_INTENSITY | BACKGROUND_RED | BACKGROUND_BLUE,
+    WhiteBack = BACKGROUND_INTENSITY | BACKGROUND_RED | BACKGROUND_GREEN | BACKGROUND_BLUE,
+};
+
+int main() {
+    srand(time(NULL));
+    system("title Arcade Game");
+    setlocale(LC_ALL, "Russian");
+
+    SetConsoleCP(1251);
+    SetConsoleOutputCP(1251);   
+
+    HANDLE console = GetStdHandle(STD_OUTPUT_HANDLE);
+
+    CONSOLE_CURSOR_INFO structCursorInfo;
+    CONSOLE_SCREEN_BUFFER_INFO csbiInfo;
+    
+    GetConsoleCursorInfo(console, &structCursorInfo);  
+    GetConsoleScreenBufferInfo(console, &csbiInfo);  
+
+    structCursorInfo.bVisible = FALSE;     
+    (console, &structCursorInfo);
+
+    system("cls");
+   
+    int choose_pos;                    
+    int iKey;                          
+    int exit_flag, back_flag;    
+    int lang = 0, diff = 100, back_color = WhiteBack, fore_color = BlackFore; 
+
+    int a1 = 0, b1, c1 = 0;
+    int b = 0, d = 0, lb = 0, rb = 100;
+    char a;
+
+    SetConsoleTextAttribute(console, back_color | fore_color);
+
+    COORD cursorPos;                   
+    //all menus
+    char* main_menu_eng[MAIN_MENU_SIZE] = { "Game", "Settings", "Exit" };
+    char* game_menu_eng[GAME_MENU_SIZE] = { "Guessing game PC", "Guessing game USER", "Back" };
+    char* settings_menu_eng[SETTINGS_MENU_SIZE] = { "Difficulty Settings", "Color Settings", "Language", "Back" };
+
+    char* main_menu_russ[MAIN_MENU_SIZE] = { "Игра","Настройки", "Выход"};
+    char* game_menu_russ[GAME_MENU_SIZE] = { "Угадайка ПК","Угадайка ПОЛЬЗОВАТЕЛЬ", "Назад"};
+    char* settings_menu_russ[SETTINGS_MENU_SIZE] = { "Настройки Сложности", "Настройки Цвета", "Язык", "Назад" };
+
+    char* main_menu[MAIN_MENU_SIZE];
+    char* game_menu[GAME_MENU_SIZE];
+    char* settings_menu[SETTINGS_MENU_SIZE];
+
+    for (int i = 0; i < MAIN_MENU_SIZE; i++) { main_menu[i] = main_menu_eng[i]; }
+    for (int i = 0; i < GAME_MENU_SIZE; i++) { game_menu[i] = game_menu_eng[i]; }
+    for (int i = 0; i < SETTINGS_MENU_SIZE; i++) { settings_menu[i] = settings_menu_eng[i]; }
+    
+    
+    //settings menu
+
+
+    char* Color_menu_eng[COLOR] = { "background", "letters", "Back" };
+    char* Language_menu_eng[LANGUAGE] = { "English", "Russian", "Back" };
+    char* difficulty_eng[DIFFICULTY] = { "Easy", "Normal", "Hard", "HELL", "Back" };
+    char* background_color_eng[COLOR_BACK] = { "Black","Maroon","Green", "Navy","Teal","Olive","Purple","Gray","Silver","Red","Lime","Blue","Aqua","Yellow","Fuchsia","white","Back" };
+    char* letter_color_eng[COLOR_LETTERS] = { "Black","Maroon","Green", "Navy","Teal","Olive","Purple","Gray","Silver","Red","Lime","Blue","Aqua","Yellow","Fuchsia","white","Back" };
+
+    char* Color_menu_russ[COLOR] = {"фон", "буквы", "назад"};
+    char* Language_menu_russ[LANGUAGE] = { "Английский", "Русский", "Назад" };
+    char* difficulty_russ[DIFFICULTY] = { "Легко", "Нормально", "Трудно", "ИНФЕРНО", "Назад" };
+    char* background_color_russ[COLOR_BACK] = { "Черный","Бордовый","Зеленый", "Морской","Бирюзовый","Оливковый","Фиолетовый","Серый","Серебристый","Красный","Красный","Лайм","Голубой","Аква","Желтый","Фуксия","Белый" };
+    char* letter_color_russ[COLOR_LETTERS] = { "Черный","Бордовый","Зеленый", "Морской","Бирюзовый","Оливковый","Фиолетовый","Серый","Серебристый","Красный","Красный","Лайм","Голубой","Аква","Желтый","Фуксия","Белый" };
+
+    char* Color_menu[COLOR];
+    char* Language_menu[LANGUAGE];
+    char* difficulty[DIFFICULTY];
+    char* background_color[COLOR_BACK];
+    char* letter_color[COLOR_LETTERS];
+    
+
+    for (int i = 0; i < COLOR; i++) { Color_menu[i] = Color_menu_eng[i];}
+    for (int i = 0; i < LANGUAGE; i++) { Language_menu[i] = Language_menu_eng[i];}
+    for (int i = 0; i < DIFFICULTY; i++) { difficulty[i] = difficulty_eng[i];}
+    for (int i = 0; i < COLOR_BACK; i++) { background_color[i] = background_color_eng[i]; }
+    for (int i = 0; i < COLOR_LETTERS; i++) { letter_color[i] = letter_color_eng[i];}
+
+    //messages
+
+
+
+
+    back_flag = 0;
+    exit_flag = 0;
+    choose_pos = 0;
+
+    while (!exit_flag) {
+        system("cls");
+        cursorPos = (COORD){ 0, 0 };
+        iKey = NOT_KEY;
+        SetConsoleCursorPosition(console, cursorPos);
+
+        while (iKey != KEY_EXIT && iKey != KEY_ENTER) {
+            back_flag = 0;
+            switch (iKey) {
+            case KEY_ARROW_UP:
+                choose_pos--;
+                break;
+            case KEY_ARROW_DOWN:
+                choose_pos++;
+                break;
+            default:
+                break;
+            }
+
+            if (choose_pos < 0) { choose_pos = MAIN_MENU_SIZE - 1; }
+            if (choose_pos > MAIN_MENU_SIZE - 1) { choose_pos = 0; }
+
+            system("cls");
+
+            for (int i = 0; i < MAIN_MENU_SIZE; i++) {
+                cursorPos = (COORD){ 3, i };
+                SetConsoleCursorPosition(console, cursorPos);
+                printf("%s \n", main_menu[i]);
+            }
+
+            cursorPos = (COORD){ 0, choose_pos };
+            SetConsoleCursorPosition(console, cursorPos);
+            printf("<<", iKey);
+            cursorPos = (COORD){ strlen(main_menu[choose_pos]) + 3 + 1, choose_pos };
+            SetConsoleCursorPosition(console, cursorPos);
+            printf(">>");
+
+            iKey = _getch();
+        }
+
+        switch (choose_pos) {
+        case 0:
+            system("cls");
+            while (!back_flag) {
+                system("cls");
+                cursorPos = (COORD){ 0, 0 };
+                iKey = NOT_KEY;
+                SetConsoleCursorPosition(console, cursorPos);
+
+                while (iKey != KEY_EXIT && iKey != KEY_ENTER) {
+                    switch (iKey) {
+                    case KEY_ARROW_UP:
+                        choose_pos--;
+                        break;
+                    case KEY_ARROW_DOWN:
+                        choose_pos++;
+                        break;
+                    default:
+                        break;
+                    }
+
+                    if (choose_pos < 0) { choose_pos = GAME_MENU_SIZE - 1; }
+                    if (choose_pos > GAME_MENU_SIZE - 1) { choose_pos = 0; }
+
+                    system("cls");
+
+                    for (int i = 0; i < GAME_MENU_SIZE; i++) {
+                        cursorPos = (COORD){ 3, i };
+                        SetConsoleCursorPosition(console, cursorPos);
+                        printf("%s \n", game_menu[i]);
+                    }
+
+                    cursorPos = (COORD){ 0, choose_pos };
+                    SetConsoleCursorPosition(console, cursorPos);
+                    printf("<<", iKey);
+                    cursorPos = (COORD){ strlen(game_menu[choose_pos]) + 3 + 1, choose_pos };
+                    SetConsoleCursorPosition(console, cursorPos);
+                    printf(">>");
+
+                    iKey = _getch();
+                }
+
+                switch (choose_pos) {
+                case 0:
+                    system("cls");
+                    switch (lang) {
+                    case 0:
+                        b = lb = d = 0;
+                        rb = diff;
+                        printf("Make a number from 0 to %d! I try to guess it in 10 attemps.\n", diff);
+
+                        for (int c = 0; c <= 10; c++) {
+                            if (lb > rb) { printf("\nYou are cheating >:(\n"); break; }
+                            b = lb + rand() % (rb - lb + 1);
+
+
+                            printf("\nIhhmm my guess is %d, did i get it right?", b);
+                            a = getchar();
+                            getchar();
+                            if (a == '=') { printf("\nOf course i got it right, im a computer after all!!!!!\n"); break; }
+                            else if (a == '>') {
+                                printf("\nDarn it, so is bigger\n");
+                                lb = b + 1;
+                            }
+                            else if (a == '<') {
+                                printf("\nDarn it, so is smaller\n");
+                                rb = b - 1;
+                            }
+                            else { printf("\nI dont understand you, please use the right symbols, i will guess another nuber\n"); }
+
+                            if (c == 10) { d = 1; }
+                        }
+
+                        if (d == 1) { printf("\nThen tell me, what is the right answer\n"); }
+                        system("pause");
+                        break;
+                    case 1:
+                        b = lb = d = 0;
+                        rb = diff;
+                        printf("Составьте число от 0 до %d! Я пытаюсь угадать его за 10 попыток.\n", diff);
+
+                        for (int c = 0; c <= 10; c++) {
+                            if (lb > rb) { printf("\nТы обманываешь >:(\n"); break; }
+                            b = lb + rand() % (rb - lb + 1);
+
+
+                            printf("\nХм, я думаю, %d, я правильно понял?", b);
+                            a = getchar();
+                            getchar();
+                            if (a == '=') { printf("\nКонечно, я все правильно понял, я ведь компьютер!!!!!\n"); break; }
+                            else if (a == '>') {
+                                printf("\nблин, оно побольше\n");
+                                lb = b + 1;
+                            }
+                            else if (a == '<') {
+                                printf("\nблин, оно поменьше\n");
+                                rb = b - 1;
+                            }
+                            else { printf("\nЯ вас не понимаю, пожалуйста, используйте правильные символы, я угадаю другое число.\n"); }
+
+                            if (c == 10) { d = 1; }
+                        }
+
+                        if (d == 1) { printf("\nТогда скажи мне, какой ответ правильный?\n"); }
+                        system("pause");
+                        break;
+                    }
+                    break;
+                case 1:
+                    system("cls");
+                    switch (lang) {
+                    case 0:
+                        
+                        a1 = rand() % diff + 1;
+                        c1 = 0; // Initialize attempt counter
+                        printf("I made a number from 0 to %d. Try to guess it in 10 attempts.\n", diff);
+                        do {
+
+                            printf("Enter your guess: ");
+                            scanf_s("%d", &b1);
+                            c1++;
+
+                            if (b1 < a1) {
+                                printf("\nThe number I'm thinking about is bigger.\n");
+                                
+                            }
+                            else if (b1 > a1) {
+                                printf("\nThe number I'm thinking about is smaller.\n");
+                                
+                            }
+
+                            if (c1 == 10) {
+                                break;
+                            }
+                        } while (b1 != a1);
+
+                        if (a1 == b1) {
+                            printf("\nCongratulations! You guessed it right. The answer is %d.\n", a1);
+                        }
+                        else {
+                            printf("\nSorry, you ran out of attempts. The answer is %d.\n", a1);
+                        }
+                        break;
+
+                    case 1:
+                        
+                        a1 = rand() % diff + 1;
+                        c1 = 0; // Initialize attempt counter
+                        printf("Я составил число от 0 до %d. Попробуйте угадать его за 10 попыток.\n", diff);
+                        do {
+                            
+                            printf("Введите свое предположение: ");
+                            scanf_s("%d", &b1);
+                            c1++;
+
+                            if (b1 < a1) {
+                                printf("\nЧисло, о котором я думаю, больше.\n");
+                            }
+                            else if (b1 > a1) {
+                                printf("\nЧисло, о котором я думаю, меньше.\n");
+                            }
+
+                            if (c1 == 10) {
+                                break;
+                            }
+                        } while (b1 != a1);
+
+                        if (a1 == b1) {
+                            printf("\nПоздравляем! Вы правильно догадались. Ответ: %d.\n", a1);
+                        }
+                        else {
+                            printf("\nИзвините, у вас закончились попытки. Ответ: %d.\n", a1);
+                        }
+                        break;
+                    default:
+                        break;
+                    }
+                    system("pause");
+                    break;
+
+                }
+            }            
+            system("pause");
+            break;
+        
+                    
+        case 1:
+            system("cls");
+            while (!back_flag) {
+                system("cls");
+                cursorPos = (COORD){ 0, 0 };
+                iKey = NOT_KEY;
+                SetConsoleCursorPosition(console, cursorPos);
+
+                while (iKey != KEY_EXIT && iKey != KEY_ENTER) {
+                    switch (iKey) {
+                    case KEY_ARROW_UP:
+                        choose_pos--;
+                        break;
+                    case KEY_ARROW_DOWN:
+                        choose_pos++;
+                        break;
+                    default:
+                        break;
+                    }
+
+                    if (choose_pos < 0) { choose_pos = SETTINGS_MENU_SIZE - 1; }
+                    if (choose_pos > SETTINGS_MENU_SIZE - 1) { choose_pos = 0; }
+
+                    system("cls");
+
+                    for (int i = 0; i < SETTINGS_MENU_SIZE; i++) {
+                        cursorPos = (COORD){ 3, i };
+                        SetConsoleCursorPosition(console, cursorPos);
+                        printf("%s \n", settings_menu[i]);
+                    }
+
+                    cursorPos = (COORD){ 0, choose_pos };
+                    SetConsoleCursorPosition(console, cursorPos);
+                    printf("<<", iKey);
+                    cursorPos = (COORD){ strlen(settings_menu[choose_pos]) + 3 + 1, choose_pos };
+                    SetConsoleCursorPosition(console, cursorPos);
+                    printf(">>");
+
+                    iKey = _getch();
+                }
+
+                switch (choose_pos) {
+                case 0:
+                    system("cls");
+                    while (!back_flag) {
+                        system("cls");
+                        cursorPos = (COORD){ 0, 0 };
+                        iKey = NOT_KEY;
+                        SetConsoleCursorPosition(console, cursorPos);
+
+                        while (iKey != KEY_EXIT && iKey != KEY_ENTER) {
+                            switch (iKey) {
+                            case KEY_ARROW_UP:
+                                choose_pos--;
+                                break;
+                            case KEY_ARROW_DOWN:
+                                choose_pos++;
+                                break;
+                            default:
+                                break;
+                            }
+
+                            if (choose_pos < 0) { choose_pos = DIFFICULTY - 1; }
+                            if (choose_pos > DIFFICULTY - 1) { choose_pos = 0; }
+
+                            system("cls");
+
+                            for (int i = 0; i < DIFFICULTY; i++) {
+                                cursorPos = (COORD){ 3, i };
+                                SetConsoleCursorPosition(console, cursorPos);
+                                printf("%s \n", difficulty[i]);
+                            }
+
+                            cursorPos = (COORD){ 0, choose_pos };
+                            SetConsoleCursorPosition(console, cursorPos);
+                            printf("<<", iKey);
+                            cursorPos = (COORD){ strlen(difficulty[choose_pos]) + 3 + 1, choose_pos };
+                            SetConsoleCursorPosition(console, cursorPos);
+                            printf(">>");
+
+                            iKey = _getch();
+                        }
+
+                        switch (choose_pos) {
+                        case 0:
+                            printf("\nEasy was chosen\n");
+                            system("pause");
+                            diff = 10;
+                            break;
+                        case 1:
+                            printf("\nNormal was chosen\n");
+                            system("pause");
+                            diff = 100;
+                            break;
+                        case 2:
+                            printf("\nHard was chosen\n");
+                            system("pause");
+                            diff = 1000;
+                            break;
+                        case 3:
+                            printf("\nHELL was chosen\n");
+                            system("pause");
+                            diff = 10000;
+                            break;
+                        case 4:
+                            back_flag = 1;
+                            break;
+                        }
+                    }
+                    back_flag = 0;
+                    system("pause");
+                    break;
+                case 1:
+                    system("cls");
+                    while (!back_flag) {
+                        system("cls");
+                        cursorPos = (COORD){ 0, 0 };
+                        iKey = NOT_KEY;
+                        SetConsoleCursorPosition(console, cursorPos);
+
+                        while (iKey != KEY_EXIT && iKey != KEY_ENTER) {
+                            switch (iKey) {
+                            case KEY_ARROW_UP:
+                                choose_pos--;
+                                break;
+                            case KEY_ARROW_DOWN:
+                                choose_pos++;
+                                break;
+                            default:
+                                break;
+                            }
+
+                            if (choose_pos < 0) { choose_pos = COLOR - 1; }
+                            if (choose_pos > COLOR - 1) { choose_pos = 0; }
+
+                            system("cls");
+
+                            for (int i = 0; i < COLOR; i++) {
+                                cursorPos = (COORD){ 3, i };
+                                SetConsoleCursorPosition(console, cursorPos);
+                                printf("%s \n", Color_menu[i]);
+                            }
+
+                            cursorPos = (COORD){ 0, choose_pos };
+                            SetConsoleCursorPosition(console, cursorPos);
+                            printf("<<", iKey);
+                            cursorPos = (COORD){ strlen(Color_menu[choose_pos]) + 3 + 1, choose_pos };
+                            SetConsoleCursorPosition(console, cursorPos);
+                            printf(">>");
+
+                            iKey = _getch();
+                        }
+
+                        switch (choose_pos) {
+                        case 0:
+                            system("cls");
+                            while (!back_flag) {
+                                system("cls");
+                                cursorPos = (COORD){ 0, 0 };
+                                iKey = NOT_KEY;
+                                SetConsoleCursorPosition(console, cursorPos);
+
+                                while (iKey != KEY_EXIT && iKey != KEY_ENTER) {
+                                    switch (iKey) {
+                                    case KEY_ARROW_UP:
+                                        choose_pos--;
+                                        break;
+                                    case KEY_ARROW_DOWN:
+                                        choose_pos++;
+                                        break;
+                                    default:
+                                        break;
+                                    }
+
+                                    if (choose_pos < 0) { choose_pos = COLOR_BACK - 1; }
+                                    if (choose_pos > COLOR_BACK -1) { choose_pos = 0; }
+
+                                    system("cls");
+
+                                    for (int i = 0; i < COLOR_BACK; i++) {
+                                        cursorPos = (COORD){ 3, i };
+                                        SetConsoleCursorPosition(console, cursorPos);
+                                        printf("%s \n", background_color[i]);
+                                    }
+
+                                    cursorPos = (COORD){ 0, choose_pos };
+                                    SetConsoleCursorPosition(console, cursorPos);
+                                    printf("<<", iKey);
+                                    cursorPos = (COORD){ strlen(background_color[choose_pos]) + 3 + 1, choose_pos };
+                                    SetConsoleCursorPosition(console, cursorPos);
+                                    printf(">>");
+
+                                    iKey = _getch();
+                                }
+
+                                switch (choose_pos) {
+                                case 0:
+                                    if (fore_color == BlackFore) {
+                                        printf("\n Please change your letters color before choosing this color for the backgroud\n");
+                                    }
+                                    else {
+                                        SetConsoleTextAttribute(console, BlackBack | fore_color);
+                                        back_color = BlackBack;
+                                    }
+                                    system("pause");
+                                    break;
+                                case 1:
+                                    if (fore_color == MaroonFore) {
+                                        printf("\n Please change your letters color before choosing this color for the backgroud\n");
+                                    }
+                                    else {
+                                        SetConsoleTextAttribute(console, MaroonBack | fore_color);
+                                        back_color = MaroonBack;
+                                    }
+                                    system("pause");
+                                    break;
+                                case 2:
+                                    if (fore_color == GreenFore) {
+                                        printf("\n Please change your letters color before choosing this color for the backgroud\n");
+                                    }
+                                    else {
+                                        SetConsoleTextAttribute(console, GreenBack | fore_color);
+                                        back_color = GreenBack;
+                                    }
+                                    system("pause");
+                                    break;
+                                case 3:
+                                    if (fore_color == NavyFore) {
+                                        printf("\n Please change your letters color before choosing this color for the backgroud\n");
+                                    }
+                                    else {
+                                        SetConsoleTextAttribute(console, NavyBack | fore_color);
+                                        back_color = NavyBack;
+                                    }
+                                    system("pause");
+                                    break;
+                                case 4:
+                                    if (fore_color == TealFore) {
+                                        printf("\n Please change your letters color before choosing this color for the backgroud\n");
+                                    }
+                                    else {
+                                        SetConsoleTextAttribute(console, TealBack | fore_color);
+                                        back_color = TealBack;
+                                    }
+                                    system("pause");
+                                    break;
+                                case 5:
+                                    if (fore_color == OliveFore) {
+                                        printf("\n Please change your letters color before choosing this color for the backgroud\n");
+                                    }
+                                    else {
+                                        SetConsoleTextAttribute(console, OliveBack | fore_color);
+                                        back_color = OliveBack;
+                                    }
+                                    system("pause");
+                                    break;
+                                case 6:
+                                    if (fore_color == PurpleFore) {
+                                        printf("\n Please change your letters color before choosing this color for the backgroud\n");
+                                    }
+                                    else {
+                                        SetConsoleTextAttribute(console, PurpleBack | fore_color);
+                                        back_color = PurpleBack;
+                                    }
+                                    system("pause");
+                                    break;
+                                case 7:
+                                    if (fore_color == GrayFore) {
+                                        printf("\n Please change your letters color before choosing this color for the backgroud\n");
+                                    }
+                                    else {
+                                        SetConsoleTextAttribute(console, GrayBack | fore_color);
+                                        back_color = GrayBack;
+                                    }
+                                    system("pause");
+                                    break;
+                                case 8:
+                                    if (fore_color == SilverFore) {
+                                        printf("\n Please change your letters color before choosing this color for the backgroud\n");
+                                    }
+                                    else {
+                                        SetConsoleTextAttribute(console, SilverBack | fore_color);
+                                        back_color = SilverBack;
+                                    }
+                                    system("pause");
+                                    break;
+                                case 9:
+                                    if (fore_color == RedFore) {
+                                        printf("\n Please change your letters color before choosing this color for the backgroud\n");
+                                    }
+                                    else {
+                                        SetConsoleTextAttribute(console, RedBack | fore_color);
+                                        back_color = RedBack;
+                                    }
+                                    system("pause");
+                                    break;
+                                case 10:
+                                    if (fore_color == LimeFore) {
+                                        printf("\n Please change your letters color before choosing this color for the backgroud\n");
+                                    }
+                                    else {
+                                        SetConsoleTextAttribute(console, LimeBack | fore_color);
+                                        back_color = LimeBack;
+                                    }
+                                    system("pause");
+                                    break;
+                                case 11:
+                                    if (fore_color == BlueFore) {
+                                        printf("\n Please change your letters color before choosing this color for the backgroud\n");
+                                    }
+                                    else {
+                                        SetConsoleTextAttribute(console, BlueBack | fore_color);
+                                        back_color = BlueBack;
+                                    }
+                                    system("pause");
+                                    break;
+                                case 12:
+                                    if (fore_color == AquaFore) {
+                                        printf("\n Please change your letters color before choosing this color for the backgroud\n");
+                                    }
+                                    else {
+                                        SetConsoleTextAttribute(console, AquaBack | fore_color);
+                                        back_color = AquaBack;
+                                    }
+                                    system("pause");
+                                    break;
+                                case 13:
+                                    if (fore_color == YellowFore) {
+                                        printf("\n Please change your letters color before choosing this color for the backgroud\n");
+                                    }
+                                    else {
+                                        SetConsoleTextAttribute(console, YellowBack | fore_color);
+                                        back_color = YellowBack;
+                                    }
+                                    system("pause");
+                                    break;
+                                case 14:
+                                    if (fore_color == FuchsiaFore) {
+                                        printf("\n Please change your letters color before choosing this color for the backgroud\n");
+                                    }
+                                    else {
+                                        SetConsoleTextAttribute(console, FuchsiaBack | fore_color);
+                                        back_color = FuchsiaBack;
+                                    }
+                                    system("pause");
+                                    break;
+                                case 15:
+                                    if (fore_color == WhiteFore) {
+                                        printf("\n Please change your letters color before choosing this color for the backgroud\n");
+                                    }
+                                    else {
+                                        SetConsoleTextAttribute(console, WhiteBack | fore_color);
+                                        back_color = WhiteBack;
+                                    }
+                                    system("pause");
+                                    break;
+                                case 16:
+                                    back_flag = 1;
+                                    break;
+                                }
+                            }
+                            back_flag = 0;
+                            system("pause");
+                            break;
+                        case 1:
+                            system("cls");
+                            while (!back_flag) {
+                                system("cls");
+                                cursorPos = (COORD){ 0, 0 };
+                                iKey = NOT_KEY;
+                                SetConsoleCursorPosition(console, cursorPos);
+
+                                while (iKey != KEY_EXIT && iKey != KEY_ENTER) {
+                                    switch (iKey) {
+                                    case KEY_ARROW_UP:
+                                        choose_pos--;
+                                        break;
+                                    case KEY_ARROW_DOWN:
+                                        choose_pos++;
+                                        break;
+                                    default:
+                                        break;
+                                    }
+
+                                    if (choose_pos < 0) { choose_pos = COLOR_LETTERS - 1; }
+                                    if (choose_pos > COLOR_LETTERS - 1) { choose_pos = 0; }
+
+                                    system("cls");
+
+                                    for (int i = 0; i < COLOR_LETTERS; i++) {
+                                        cursorPos = (COORD){ 3, i };
+                                        SetConsoleCursorPosition(console, cursorPos);
+                                        printf("%s \n", letter_color[i]);
+                                    }
+
+                                    cursorPos = (COORD){ 0, choose_pos };
+                                    SetConsoleCursorPosition(console, cursorPos);
+                                    printf("<<", iKey);
+                                    cursorPos = (COORD){ strlen(letter_color[choose_pos]) + 3 + 1, choose_pos };
+                                    SetConsoleCursorPosition(console, cursorPos);
+                                    printf(">>");
+
+                                    iKey = _getch();
+                                }
+
+                                switch (choose_pos) {
+                                case 0:
+                                    if (back_color == BlackFore) {
+                                        printf("\n Please change your background color before choosing this color for the letters\n");
+                                    }
+                                    else {
+                                        SetConsoleTextAttribute(console, BlackFore | back_color);
+                                        fore_color = BlackFore;
+                                    }
+                                    system("pause");
+                                    break;
+                                case 1:
+                                    if (back_color == MaroonBack) {
+                                        printf("\n Please change your background color before choosing this color for the letters\n");
+                                    }
+                                    else {
+                                        SetConsoleTextAttribute(console, MaroonFore | back_color);
+                                        fore_color = MaroonFore;
+                                    }
+                                    system("pause");
+                                    break;
+                                case 2:
+                                    if (back_color == GreenBack) {
+                                        printf("\n Please change your background color before choosing this color for the letters\n");
+                                    }
+                                    else {
+                                        SetConsoleTextAttribute(console, GreenFore | back_color);
+                                        fore_color = GreenFore;
+                                    }
+                                    system("pause");
+                                    break;
+                                case 3:
+                                    if (back_color == NavyBack) {
+                                        printf("\n Please change your background color before choosing this color for the letters\n");
+                                    }
+                                    else {
+                                        SetConsoleTextAttribute(console, NavyFore | back_color);
+                                        fore_color = NavyFore;
+                                    }
+                                    system("pause");
+                                    break;
+                                case 4:
+                                    if (back_color == TealBack) {
+                                        printf("\n Please change your background color before choosing this color for the letters\n");
+                                    }
+                                    else {
+                                        SetConsoleTextAttribute(console, TealFore | back_color);
+                                        fore_color = TealFore;
+                                    }
+                                    system("pause");
+                                    break;
+                                case 5:
+                                    if (back_color == OliveBack) {
+                                        printf("\n Please change your background color before choosing this color for the letters\n");
+                                    }
+                                    else {
+                                        SetConsoleTextAttribute(console, OliveFore | back_color);
+                                        fore_color = OliveFore;
+                                    }
+                                    system("pause");
+                                    break;
+                                case 6:
+                                    if (back_color == PurpleBack) {
+                                        printf("\n Please change your background color before choosing this color for the letters\n");
+                                    }
+                                    else {
+                                        SetConsoleTextAttribute(console, PurpleFore | back_color);
+                                        fore_color = PurpleFore;
+                                    }
+                                    system("pause");
+                                    break;
+                                case 7:
+                                    if (back_color == GrayBack) {
+                                        printf("\n Please change your background color before choosing this color for the letters\n");
+                                    }
+                                    else {
+                                        SetConsoleTextAttribute(console, GrayFore | back_color);
+                                        fore_color = GrayFore;
+                                    }
+                                    system("pause");
+                                    break;
+                                case 8:
+                                    if (back_color == SilverBack) {
+                                        printf("\n Please change your background color before choosing this color for the letters\n");
+                                    }
+                                    else {
+                                        SetConsoleTextAttribute(console, SilverFore | back_color);
+                                        fore_color = SilverFore;
+                                    }
+                                    system("pause");
+                                    break;
+                                case 9:
+                                    if (back_color == RedBack) {
+                                        printf("\n Please change your background color before choosing this color for the letters\n");
+                                    }
+                                    else {
+                                        SetConsoleTextAttribute(console, RedFore | back_color);
+                                        fore_color = RedFore;
+                                    }
+                                    system("pause");
+                                    break;
+                                case 10:
+                                    if (back_color == LimeBack) {
+                                        printf("\n Please change your background color before choosing this color for the letters\n");
+                                    }
+                                    else {
+                                        SetConsoleTextAttribute(console, LimeFore | back_color);
+                                        fore_color = LimeFore;
+                                    }
+                                    system("pause");
+                                    break;
+                                case 11:
+                                    if (back_color == BlueBack) {
+                                        printf("\n Please change your background color before choosing this color for the letters\n");
+                                    }
+                                    else {
+                                        SetConsoleTextAttribute(console, BlueFore | back_color);
+                                        fore_color = BlueFore;
+                                    }
+                                    system("pause");
+                                    break;
+                                case 12:
+                                    if (back_color == AquaBack) {
+                                        printf("\n Please change your background color before choosing this color for the letters\n");
+                                    }
+                                    else {
+                                        SetConsoleTextAttribute(console, AquaFore | back_color);
+                                        fore_color = AquaFore;
+                                    }
+                                    system("pause");
+                                    break;
+                                case 13:
+                                    if (back_color == YellowBack) {
+                                        printf("\n Please change your background color before choosing this color for the letters\n");
+                                    }
+                                    else {
+                                        SetConsoleTextAttribute(console, YellowFore | back_color);
+                                        fore_color = YellowFore;
+                                    }
+                                    system("pause");
+                                    break;
+                                case 14:
+                                    if (back_color == FuchsiaFore) {
+                                        printf("\n Please change your background color before choosing this color for the letters\n");
+                                    }
+                                    else {
+                                        SetConsoleTextAttribute(console, FuchsiaFore | back_color);
+                                        fore_color = FuchsiaFore;
+                                    }
+                                    system("pause");
+                                    break;
+                                case 15:
+                                    if (back_color == WhiteBack) {
+                                        printf("\n Please change your background color before choosing this color for the letters\n");
+                                    }
+                                    else {
+                                        SetConsoleTextAttribute(console, WhiteFore | back_color);
+                                        fore_color = WhiteFore;
+                                    }
+                                    system("pause");
+                                    break;
+                                case 16:
+                                    back_flag = 1;
+                                    break;
+                                }
+                            }
+                            back_flag = 0;
+                            system("pause");
+                            break;
+                        case 2:
+                            back_flag = 1;
+                            break;
+                        }
+                    } 
+                    back_flag = 0;
+                    system("pause");
+                    break;
+                case 2:
+                    system("cls");
+                    while (!back_flag) {
+                        system("cls");
+                        cursorPos = (COORD){ 0, 0 };
+                        iKey = NOT_KEY;
+                        SetConsoleCursorPosition(console, cursorPos);
+
+                        while (iKey != KEY_EXIT && iKey != KEY_ENTER) {
+                            switch (iKey) {
+                            case KEY_ARROW_UP:
+                                choose_pos--;
+                                break;
+                            case KEY_ARROW_DOWN:
+                                choose_pos++;
+                                break;
+                            default:
+                                break;
+                            }
+
+                            if (choose_pos < 0) { choose_pos = LANGUAGE - 1; }
+                            if (choose_pos > LANGUAGE - 1) { choose_pos = 0; }
+
+                            system("cls");
+
+                            for (int i = 0; i < LANGUAGE; i++) {
+                                cursorPos = (COORD){ 3, i };
+                                SetConsoleCursorPosition(console, cursorPos);
+                                printf("%s \n", Language_menu[i]);
+                            }
+
+                            cursorPos = (COORD){ 0, choose_pos };
+                            SetConsoleCursorPosition(console, cursorPos);
+                            printf("<<", iKey);
+                            cursorPos = (COORD){ strlen(Language_menu[choose_pos]) + 3 + 1, choose_pos };
+                            SetConsoleCursorPosition(console, cursorPos);
+                            printf(">>");
+
+                            iKey = _getch();
+                        }
+
+                        switch (choose_pos) {
+                        case 0:
+                            if (lang == 0) {
+                                printf("\nLanguage already chosen");
+
+                            }
+                            else {                                
+                                for (int i = 0; i < MAIN_MENU_SIZE; i++) { main_menu[i] = main_menu_eng[i]; }
+                                for (int i = 0; i < GAME_MENU_SIZE; i++) { game_menu[i] = game_menu_eng[i]; }
+                                for (int i = 0; i < SETTINGS_MENU_SIZE; i++) { settings_menu[i] = settings_menu_eng[i]; }
+
+
+                                for (int i = 0; i < COLOR; i++) { Color_menu[i] = Color_menu_eng[i]; }
+                                for (int i = 0; i < LANGUAGE; i++) { Language_menu[i] = Language_menu_eng[i]; }
+                                for (int i = 0; i < DIFFICULTY; i++) { difficulty[i] = difficulty_russ[i]; }
+                                for (int i = 0; i < COLOR_BACK; i++) { background_color[i] = background_color_eng[i]; }
+                                for (int i = 0; i < COLOR_LETTERS; i++) { letter_color[i] = letter_color_eng[i]; }
+                                lang = 0;
+
+                            }
+                            system("pause");
+                            break;
+                        case 1:
+                            if (lang == 0) {
+                                for (int i = 0; i < MAIN_MENU_SIZE; i++) { main_menu[i] = main_menu_russ[i]; }
+                                for (int i = 0; i < GAME_MENU_SIZE; i++) { game_menu[i] = game_menu_russ[i]; }
+                                for (int i = 0; i < SETTINGS_MENU_SIZE; i++) { settings_menu[i] = settings_menu_russ[i]; }
+
+
+                                for (int i = 0; i < COLOR; i++) { Color_menu[i] = Color_menu_russ[i]; }
+                                for (int i = 0; i < LANGUAGE; i++) { Language_menu[i] = Language_menu_russ[i]; }
+                                for (int i = 0; i < DIFFICULTY; i++) { difficulty[i] = difficulty_russ[i]; }
+                                for (int i = 0; i < COLOR_BACK; i++) { background_color[i] = background_color_russ[i]; }
+                                for (int i = 0; i < COLOR_LETTERS; i++) { letter_color[i] = letter_color_russ[i]; }
+
+                                lang = 1;
+                            }
+                            else {
+                                printf("\nmLanguage already chosen");
+                            }
+                            system("pause");
+                            break;
+                        case 2:
+                            back_flag = 1;
+                            break;
+                        }
+                    }
+                    back_flag = 0;
+                    system("pause");
+                case 3:
+                    back_flag = 1;
+                    break;
+                }
+            }
+            system("pause");
+            break;
+        case 2:
+            exit_flag = 1;
+            break;
+        }
+    }
+
+    system("cls");
+    printf("Goodbay!\n");
+    system("pause");
+    return 0;
+}
